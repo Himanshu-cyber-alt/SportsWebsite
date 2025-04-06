@@ -12,16 +12,24 @@
     <div class="login-container">
         <h2>Login Page</h2>
 
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" placeholder="Username" required>
-        </div>
+        <form action="/Login" method="POST">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="Email" name="Email" required>
+            </div>
 
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" placeholder="Password" required>
-        </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Password" name="Password" required>
+            </div>
 
-        <button class="btn login-btn">Login</button>
-        <button class="btn register-btn"><a href="/Register">Register Account</a></button>
+            <button type="submit" class="btn login-btn">Login</button>
+        </form>
+
+        <button class="btn register-btn">
+            <a href="/Register">Register Account</a>
+        </button>
     </div>
+
+</body>
+</html>

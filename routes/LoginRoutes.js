@@ -15,13 +15,10 @@ router.post('/Login',async (req,res)=>{
     const {Email,Password} = req.body;
     try{
 
-        const result = await pool.query('select email,password from Customer form email = $1',[Email])
+        const result = await pool.query('select email,password from SportsCustomer where email = $1',[Email])
 
              const DataBase = result.rows[0];
-
-
-
-             if(result.rows.length > 1){
+             if(result.rows.length > 0){
   
                  const DataBasePassword = DataBase.password;
 
@@ -32,6 +29,7 @@ router.post('/Login',async (req,res)=>{
                       }else{
 
                         if(done){
+                            console.log("User is Login is " + done)
                             res.render('Home.ejs')
                          }else{
                             res.send("Password is incorrect ")

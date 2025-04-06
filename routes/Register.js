@@ -19,7 +19,7 @@ router.post('/Register', async (req,res)=>{
 
   try{
 
-    const result = await pool.query('select * from Customer where email = $1',[Email])
+    const result = await pool.query('select * from SportsCustomer where email = $1',[Email])
 
     if(result.rows.length > 1){
         
@@ -32,8 +32,8 @@ router.post('/Register', async (req,res)=>{
                if(err){
                 console.log(err)
                }else{
-            const result2 = await pool.query('insert into Customer (name,email,password) values($1,$2,$3)',[Name,Email,Password])
-
+            const result2 = await pool.query('insert into SportsCustomer (name,email,password) values($1,$2,$3)',[Name,Email,hash]) 
+            res.render('Login.ejs')
                }
         })
     }
