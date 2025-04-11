@@ -1,58 +1,73 @@
 import passport from "passport";
 import session from 'express-session';
 import bcrypt from 'bcrypt'
+import { Strategy as LocalStrategy } from 'passport-local';
+import pool from "./db.js";
+import GoogleStrategy from "passport-google-oauth2";
+import dotenv from "dotenv"
+
+
+dotenv.config();
 
 
 
-passport.use(new Strategy({
-    usernameField: 'RollNumber',  // is like body parser we can get all the req.body for tis  
-    passwordField: 'Password'     
-}, async function(rollNumber, password, callBack) {
+passport.use(new LocalStrategy({
+    usernameField: 'Email',   
+    passwordField: 'Password' // match your form field name
+                              // match your form field name
+}, async function verify(Email, Password, cb) {
     try {
-        const result = await pool.query('SELECT roll, password FROM main_table WHERE roll = $1', [rollNumber]);
-        
-        if (result.rows.length > 0) {
-            const user = result.rows[0];
-            const databasePass = user.password;
-            
-       
-            bcrypt.compare(password, databasePass, (err, isMatch) => {
-                if (err) {
-                    return callBack(err);
-                }
-                
-                if (isMatch) {
-                    return callBack(null, user);
-                } else {
-                    return callBack(null, false, { message: 'Incorrect password' });
-                }
-            });
-        } else {
-            return callBack(null, false, { message: 'User not found' });
-        }
-    } catch (error) {
-        return callBack(error);
+        const result = await pool.query('SELECT * FROM SportsCustomer WHERE email = $1', [Email]);
+        const user = result.rows[0];
+
+        if (!user) return cb(null, false); // return 
+
+        bcrypt.compare(Password, user.password, (err, matched) => {
+            if (err) return cb(err);
+            if (matched) return cb(null, user);
+            return cb(null, false);
+        });
+    } catch (err) {
+        return cb(err);
     }
 }));
 
 
 
-
-passport.serializeUser((user, callBack) => {
-    callBack(null, user.roll); //  
-});
-
-
-
-passport.deserializeUser(async (rollNumber, callBack) => {
+passport.use("google", new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+   callbackURL: "http://localhost:7000/auth/google/DashBord",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    passReqToCallback: true
+}, async (req, accessToken, refreshToken, profile, cb) => {
     try {
-        const result = await pool.query('SELECT * FROM main_table WHERE roll = $1', [rollNumber]);
-        if (result.rows.length > 0) {
-            callBack(null, result.rows[0]);
-        } else {
-            callBack(new Error('User not found'));
+        const email = profile.email;
+
+        // Check if user already exists
+        const result = await pool.query('SELECT * FROM SportsCustomer WHERE email = $1', [email]);
+        let user = result.rows[0];
+
+        // If not, insert into DB
+        if (!user) {
+            const insert = await pool.query(
+                'INSERT INTO SportsCustomer (name, email, password) VALUES ($1, $2, $3) RETURNING *',
+                [profile.displayName, email, ''] // password can be empty for Google
+            );
+            user = insert.rows[0];
         }
-    } catch (error) {
-        callBack(error);
+
+        return cb(null, user);
+    } catch (err) {
+        return cb(err);
     }
-});
+}));
+
+
+passport.serializeUser((user,cb)=>{
+    return cb(null,user);
+})
+
+passport.deserializeUser((user,cb)=>{
+    return cb(null,user);
+})

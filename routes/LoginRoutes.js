@@ -1,57 +1,35 @@
-import express from  'express'
+import express from 'express';
 import pool from '../config/db.js';
-import bcrypt from 'bcrypt'
-const  router = express.Router();
+import bcrypt from 'bcrypt';
+import passport from 'passport';
+import { ensureAuthenticated } from '../middleware/authMiddleware.js';
+
+const router = express.Router();
+
+// GET Login Page
+router.get('/Login', (req, res) => {
+      res.render('Login.ejs')
+});
+
+router.get('/Logout', (req, res) => {
+    req.logout(err => {
+        if (err) return next(err);
+        res.redirect('/Login');
+    });
+});
 
 
-
-router.get('/Login',(req,res)=>{
-    res.render('Login.ejs')
-})
-
-
-router.post('/Login',async (req,res)=>{
-
-    const {Email,Password} = req.body;
-    try{
-
-        const result = await pool.query('select email,password from SportsCustomer where email = $1',[Email])
-
-             const DataBase = result.rows[0];
-             if(result.rows.length > 0){
-  
-                 const DataBasePassword = DataBase.password;
-
-                 bcrypt.compare(Password,DataBasePassword,(err,done)=>{
-
-                      if(err){
-                        console.log("shit",err)
-                      }else{
-
-                        if(done){
-                            console.log("User is Login is " + done)
-                            res.render('Home.ejs')
-                         }else{
-                            res.send("Password is incorrect ")
-                         }
-
-                      }
-                        
+// 
+router.post('/Login', passport.authenticate('local', {
+    successRedirect: '/DashBord',
+    failureRedirect: '/Login', // 🔁 Better to go back to login on failure
+}));
 
 
-                 })
+// Protected Route
+router.get('/DashBord', ensureAuthenticated, (req, res) => {
+    res.render('DashBord.ejs');
+});
 
-
-                
-
-             }else{
-                res.render('Register.ejs')
-             }
-
-    }
-    catch(err){
-        console.log(err)
-    }
-})
 
 export default router;

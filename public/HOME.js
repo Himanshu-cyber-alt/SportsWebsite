@@ -85,3 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+const cartIcon = document.querySelector('.fa-shopping-cart');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+
+cartIcon.addEventListener('click', () => {
+  cartSidebar.classList.add('active');
+});
+
+closeCart.addEventListener('click', () => {
+  cartSidebar.classList.remove('active');
+});
