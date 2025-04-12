@@ -37,7 +37,7 @@ passport.use(new LocalStrategy({
 passport.use("google", new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-   callbackURL: "http://localhost:7000/auth/google/DashBord",
+    callbackURL: "https://gearupsport.onrender.com/auth/google/DashBord",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     passReqToCallback: true
 }, async (req, accessToken, refreshToken, profile, cb) => {
