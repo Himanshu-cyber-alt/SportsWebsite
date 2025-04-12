@@ -1,6 +1,6 @@
 import passport from "passport";
 import session from 'express-session';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { Strategy as LocalStrategy } from 'passport-local';
 import pool from "./db.js";
 import GoogleStrategy from "passport-google-oauth2";

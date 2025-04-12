@@ -1,6 +1,4 @@
 import express from 'express';
-import pool from '../config/db.js';
-import bcrypt from 'bcrypt';
 import passport from 'passport';
 import { ensureAuthenticated } from '../middleware/authMiddleware.js';
 

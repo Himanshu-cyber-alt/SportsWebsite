@@ -6,7 +6,8 @@ import session from 'express-session';
 import passport from 'passport';
 import './config/passport.js'; 
 import './config/passport.js'
-import authRoutes  from "./routes/authRoutes.js"
+
+
 
 const app = express();
 const port =  7000;
